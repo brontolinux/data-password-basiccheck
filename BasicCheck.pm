@@ -1,14 +1,19 @@
 package Data::Password::BasicCheck;
 
+# $Id: BasicCheck.pm,v 1.2 2003-08-08 16:16:58 bronto Exp $
+
 use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant MIN => 0 ;
 use constant MAX => 1 ;
 use constant SYM => 2 ;
+
+use constant OK    => 'password ok' ;
+use constant DEBUG => 0 ;
 
 sub new {
   my $class = shift ;
@@ -31,7 +36,8 @@ sub psym   { return $_[0]->[SYM] }
 sub _parms { return @{$_[0]}     }
 
 sub check {
-  my ($self,$username,$password,$name,$surname,$city) = @_ ;
+  my $self = shift ;
+  my ($username,$password,$name,$surname,$city) = @_ ;
 
   die "Not a class method!"
     unless ref $self and eval { $self->isa('Data::Password::BasicCheck') } ;
@@ -44,6 +50,26 @@ sub check {
     return "password is too long"  if $plen > $maxlen ;
   }
 
+  my $result = $self->_docheck(@_) ;
+  return $result if $result eq OK ;
+
+  # Try shorter segments...
+  my $segments = $plen - $minlen ;
+  return $result unless $segments > 1 ;
+  foreach (my $i = 0 ; $i <= $segments; $i++) {
+    my $segment = substr $password,$i,$minlen ;
+    print STDERR "DEBUG: Trying $segment\n" if DEBUG ;
+    $result = $self->_docheck($username,$segment,$name,$surname,$city) ;
+    return $result if $result eq OK ;
+  }
+  return "definitely too weak!" ;
+}
+
+sub _docheck {
+  my ($self,$username,$password,$name,$surname,$city) = @_ ;
+
+  my ($minlen,$maxlen,$psym) = $self->_parms ;
+  my $plen                   = length $password ;
   # Password contains alphas, digits and non-alpha-digits
   {
     local $_ = $password ;
@@ -55,7 +81,10 @@ sub check {
   {
     my @chars = split //,$password ;
     my %unique ;
-    foreach my $char (@chars) { $unique{$char}++ } ;
+    foreach my $char (@chars) {
+      $unique{$char}++;
+    }
+    ;
     return "Not enough different symbols in password"
       unless scalar keys %unique >= sprintf "%.0f",$psym * $plen ;
   }
@@ -64,7 +93,7 @@ sub check {
   {
     foreach my $rot (_rotations($password)) {
       return "Password matches itself after some left rotation"
-        if $rot eq $password ;
+	if $rot eq $password ;
     }
   }
 
@@ -108,8 +137,9 @@ sub check {
     }
   }
 
-  return "password ok" ;
+  return OK ;
 }
+
 
 sub _rotations {
   my $string = shift ;
