@@ -1,4 +1,4 @@
-Data/Password/BasicCheck version 1.00
+Data/Password/BasicCheck version 2.00
 =====================================
 
     Data::Password::BasicChecker objects do these kind of checks on the
@@ -53,4 +53,4 @@ to the Free Software Foundation, Inc., 59 Temple Place
 - Suite 330, Boston, MA 02111-1307, USA.
 
 
-$Id: README,v 1.4 2003-08-13 17:09:43 bronto Exp $
+$Id: README,v 1.5 2003-09-18 20:38:12 bronto Exp $

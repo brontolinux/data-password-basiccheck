@@ -1,6 +1,14 @@
 Revision history for Perl extension Data::Password::BasicCheck.
 
-$Id: Changes,v 1.4 2003-08-13 17:09:43 bronto Exp $
+$Id: Changes,v 1.5 2003-09-18 20:38:12 bronto Exp $
+
+2.00  Thu Sep 18 22:10:24 CEST 2003
+        - 1.00 was too stupid! Now you can check your password against
+	  an arbitrary amount of user's data. This imposed a change in
+	  module's interface and, therefore, documentation.
+	  A part about the difference between Data::Password and
+	  Data::Password::BasicCheck was missing, hopefully this has
+  	  been fixed
 
 1.00  Wed Aug 13 19:06:38 CEST 2003
         - updated the documentation for publication on CPAN,

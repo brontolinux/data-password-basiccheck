@@ -1,12 +1,12 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.6 2003-08-13 17:09:43 bronto Exp $
+# $Id: BasicCheck.pm,v 1.7 2003-09-18 20:38:12 bronto Exp $
 
 use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '2.00';
 
 # Object parameters
 use constant MIN => 0 ;
@@ -49,7 +49,7 @@ sub _parms { return @{$_[0]}     }
 
 sub check {
   my $self = shift ;
-  my ($username,$password,$name,$surname,$city) = @_ ;
+  my ($password,@userinfo) = @_ ;
 
   die "Not a class method!"
     unless ref $self and eval { $self->isa('Data::Password::BasicCheck') } ;
@@ -71,14 +71,14 @@ sub check {
   foreach (my $i = 0 ; $i <= $segments; $i++) {
     my $segment = substr $password,$i,$minlen ;
     print STDERR "DEBUG: Trying $segment\n" if DEBUG ;
-    $result = $self->_docheck($username,$segment,$name,$surname,$city) ;
+    $result = $self->_docheck($segment,@userinfo) ;
     return $result if $result eq OK ;
   }
   return WEAK ;
 }
 
 sub _docheck {
-  my ($self,$username,$password,$name,$surname,$city) = @_ ;
+  my ($self,$password,@userinfo) = @_ ;
 
   my ($minlen,$maxlen,$psym) = $self->_parms ;
   my $plen                   = length $password ;
@@ -109,8 +109,8 @@ sub _docheck {
     }
   }
 
-  # Check password against username, name, surname and city. All but
-  # username could be composed, like "Alan Louis", or "Di Cioccio" or
+  # Check password against user data.Some of user data could be
+  # composed, like "Alan Louis", or "Di Cioccio" or
   # "Los Angeles", so we have to treat each chunk separately.  But we
   # should also check for passwords like "alanlouis", or "dicioccio"
   # or "losangeles". So we must add them, too.
@@ -124,15 +124,14 @@ sub _docheck {
 		 $rpclean,_rotations($rpclean)) ;
 
     # Prepare personal information to match @prots against
-    ($name,$surname,$city) = map lc,($name,$surname,$city)  ;
-    my @chunks = split(/\s+/,join(" ",$name,$surname,$city)) ;
-    foreach ($name,$surname,$city) {
+    @userinfo = map lc,@userinfo  ;
+    my @chunks = split(/\s+/,join(" ",@userinfo)) ;
+    foreach (@userinfo) {
       if (/\s/) {
 	s/\s// ;
 	push @chunks,$_ ;
       }
     }
-    push @chunks,lc $username ;
 
     my $idx ;
     foreach my $chunk (@chunks) {
@@ -191,9 +190,9 @@ Data::Password::BasicCheck - Basic password checking
                                                 .5) ; # symbol factor
 
   my $ok = $pwcheck->OK ;
-  my $check = $pwcheck->check('bronto','My!Pass1',
+  my $check = $pwcheck->check('My!Pass1','bronto',
                               'Marco', 'Marongiu',
-                              'Los Angeles') ;
+                              'Los Angeles','1971 03 17') ;
 
   unless ($check eq $ok) { die "Please choose a better password" }
   print "Greetings! Your password was good :-)\n\n" ;
@@ -204,9 +203,12 @@ This class is used to build basic password checkers. They don't match
 password against dictionaries, nor they do complex elaborations. They
 just check that minimal security conditions are verified.
 
+If you need a more accurate check, e.g. against a dicitonary, you
+should consider using a different module, like Data::Password.
+
 =head1 DESCRIPTION
 
-Data::Password::BasicChecker objects do these kind of checks on the
+Data::Password::BasicCheck objects will do the following checks on the
 given passwords:
 
 =over 4
@@ -268,11 +270,11 @@ default one otherwise.
 
 =head2 check
 
-takes five arguments: a username, a password, first name, last name
-and city. It first checks that the password in itself is good; if it
-isn't, checks to see if there exists at least a segment of minimal
-length that could be considered secure (the reason for this check will
-be explained in the next revision of this document). It returns an
+Takes a password to check as first argument, and an arbitrary length
+list of personal data (e.g.: user's ID, name, surname, city,
+birthdate...) It first checks that the password in itself is good; if
+it isn't, checks to see if there exists at least a segment of minimal
+length that could be considered secure. It returns an
 integer value, starting from 0, whose meaning is:
 
 =over 4
@@ -313,6 +315,31 @@ password and on all minimal length segments of it
 
 =back
 
+=head1 WHY WE FALL BACK TO MINIMAL LENGTH SUBPASSWORDS
+
+If you establish that passwords should have a minimal length of 5
+characters and a maximal length of 20, you should consider that your
+system's security depends on password having at least a 5 character
+long segment that can be considered secure. Since it was hard for me
+to understand it at first, I'll explain this by example to make it
+clear. 
+
+So, let's suppose that we want passwords from 5 to 15 characters long,
+with a psym factor of 2/3. The password C<1pas;> could be considered
+secure (it has numbers, symbols and alphabetic characters, and each
+character is unique). What about the password C<1pas;aaaaaaaaaa>? 
+Well, it won't pass the test for repeated characters (it has 11 a's
+for an overall length of 15); but you surely noticed that it is
+exactly the previous password padded with a's to the maximum
+length. Since the first password was considered secure, we can't
+consider the second less secure than it, the same way we don't make
+our car less secure if, besides the normal locks, we add a steering
+wheel locker (in fact, it should be more secure).
+
+Therefore, if the full length password can be considered secure,
+that's good. If it's not, but a minimal length segment is, that
+segment is good, and the rest of the password is added noise, which
+makes it more secure and not easier to guess.
 
 =head1 TO DO
 
@@ -320,7 +347,8 @@ password and on all minimal length segments of it
 
 =item *
 
-Write a better documentation!
+Implement more advanced techniques with Quantum::Superpositions, as
+suggested by larsen <http://perlmonks.org/index.pl?node=larsen>
 
 =back
 
