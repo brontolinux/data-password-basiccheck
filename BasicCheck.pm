@@ -1,6 +1,6 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.4 2003-08-10 16:00:45 bronto Exp $
+# $Id: BasicCheck.pm,v 1.5 2003-08-11 15:27:48 bronto Exp $
 
 use 5.008;
 use strict;
@@ -185,15 +185,18 @@ Data::Password::BasicCheck - Basic password checking
   # 8 characters long password we require at least 4 different
   # symbols, for 7 characters long password we again require
   # 4 symbols, since 7 *.5 = 3.5, which rounds to 4.
+
   my $pwcheck = Data::Password::BasicCheck->new(6, # minimal length
                                                 8, # maximum length
                                                 .5) ; # symbol factor
 
   my $ok = $pwcheck->OK ;
-  my $check = $pwcheck->('bronto','My!Pass1',
-                         'Marco', 'Marongiu', 'Los Angeles') ;
+  my $check = $pwcheck->check('bronto','My!Pass1',
+                              'Marco', 'Marongiu',
+                              'Los Angeles') ;
 
-  unless ($check eq $ok) { die "Use a good password, you idiot!" }
+  unless ($check eq $ok) { die "Please choose a better password" }
+  print "Greetings! Your password was good :-)\n\n" ;
 
 =head1 ABSTRACT
 
@@ -226,7 +229,8 @@ characters;
 
 =item *
 
-rotations of the password don't match it
+rotations of the password don't match it (e.g.: the password a1&a1&
+matches itself after three rotations)
 
 =item *
 
@@ -266,8 +270,8 @@ default one otherwise.
 
 takes five arguments: a username, a password, first name, last name
 and city. It first checks that the password in itself is good; if it
-isn't, checks to see if there exists at least a segment of mnimal
-length that cold be considered secure (the reason for this check will
+isn't, checks to see if there exists at least a segment of minimal
+length that could be considered secure (the reason for this check will
 be explained in the next revision of this document). It returns an
 integer value, starting from 0, whose meaning is:
 
