@@ -1,6 +1,6 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.3 2003-08-10 15:28:46 bronto Exp $
+# $Id: BasicCheck.pm,v 1.4 2003-08-10 16:00:45 bronto Exp $
 
 use 5.008;
 use strict;
@@ -8,11 +8,23 @@ use warnings;
 
 our $VERSION = '0.03';
 
+# Object parameters
 use constant MIN => 0 ;
 use constant MAX => 1 ;
 use constant SYM => 2 ;
 
-use constant OK    => 'password ok' ;
+# Return values
+use constant OK    => 0 ; # password ok
+use constant SHORT => 1 ; # password is too short
+use constant LONG  => 2 ; # password is too long
+use constant A1SYM => 3 ; # password must contain alphas, digits and symbols
+use constant NOSYM => 4 ; # not enough different symbols in password
+use constant ROT   => 5 ; # password matches itself after some rotation
+use constant PINFO => 6 ; # password matches personal information
+use constant WEAK  => 127 ; # password too weak (generic)
+
+
+# Other constants
 use constant DEBUG => 0 ;
 
 sub new {
@@ -46,8 +58,8 @@ sub check {
   my $plen                   = length $password ;
   # Check length
   {
-    return "password is too short" if $plen < $minlen ;
-    return "password is too long"  if $plen > $maxlen ;
+    return SHORT if $plen < $minlen ;
+    return LONG  if $plen > $maxlen ;
   }
 
   my $result = $self->_docheck(@_) ;
@@ -62,7 +74,7 @@ sub check {
     $result = $self->_docheck($username,$segment,$name,$surname,$city) ;
     return $result if $result eq OK ;
   }
-  return "definitely too weak!" ;
+  return WEAK ;
 }
 
 sub _docheck {
@@ -73,7 +85,7 @@ sub _docheck {
   # Password contains alphas, digits and non-alpha-digits
   {
     local $_ = $password ;
-    return "Password must contain alphanumeric characters, digits and symbols"
+    return A1SYM
       unless /[a-z]/i and /\d/ and /[^a-z0-9]/i ;
   }
 
@@ -85,14 +97,14 @@ sub _docheck {
       $unique{$char}++;
     }
     ;
-    return "Not enough different symbols in password"
+    return SYM
       unless scalar keys %unique >= sprintf "%.0f",$psym * $plen ;
   }
 
   # rotations of the password don't match it
   {
     foreach my $rot (_rotations($password)) {
-      return "Password matches itself after some left rotation"
+      return ROT
 	if $rot eq $password ;
     }
   }
@@ -131,7 +143,7 @@ sub _docheck {
 	  index $chunk,$cutrot:
 	  index $cutrot,$chunk;
 	unless ($idx == -1) {
-	  return "Your password matches personal information" ;
+	  return PINFO ;
 	}
       }
     }
@@ -256,12 +268,46 @@ takes five arguments: a username, a password, first name, last name
 and city. It first checks that the password in itself is good; if it
 isn't, checks to see if there exists at least a segment of mnimal
 length that cold be considered secure (the reason for this check will
-be explained in the next revision of this document). It returns a
-string stating if the password was good or not (in english, sorry;
-yes, we need a bit of internationalization here!!!).
+be explained in the next revision of this document). It returns an
+integer value, starting from 0, whose meaning is:
 
-You can see what the message for a good password looks like by
-examining Data::Password::BasicCheck->OK.
+=over 4
+
+=item '0'
+
+password ok
+
+=item 1
+
+password too short
+
+=item 2
+
+password too long
+
+=item 3
+
+password must contain alphabetic characters, digits and
+non-alphanumeric symbols; 
+
+=item 4
+
+not enough different symbols in password
+
+=item 5
+
+password matches itself after some rotations
+
+=item 6
+
+password matches personal information
+
+=item 127
+
+password too weak: security checks have failed on the
+password and on all minimal length segments of it
+
+=back
 
 
 =head1 TO DO
@@ -271,10 +317,6 @@ examining Data::Password::BasicCheck->OK.
 =item *
 
 Write a better documentation!
-
-=item *
-
-check should return numeric values, starting from 0 (OK).
 
 =back
 
