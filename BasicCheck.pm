@@ -1,12 +1,12 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.5 2003-08-11 15:27:48 bronto Exp $
+# $Id: BasicCheck.pm,v 1.6 2003-08-13 17:09:43 bronto Exp $
 
-use 5.008;
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 # Object parameters
 use constant MIN => 0 ;

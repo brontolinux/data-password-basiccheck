@@ -1,6 +1,11 @@
 Revision history for Perl extension Data::Password::BasicCheck.
 
-$Id: Changes,v 1.3 2003-08-10 15:29:02 bronto Exp $
+$Id: Changes,v 1.4 2003-08-13 17:09:43 bronto Exp $
+
+1.00  Wed Aug 13 19:06:38 CEST 2003
+        - updated the documentation for publication on CPAN,
+          a great thank to dree (Andrea Maestrutti) for his
+          help.
 
 0.03  Sun Aug 10 17:18:59 CEST 2003
         - added some documentation
