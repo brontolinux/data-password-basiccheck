@@ -1,12 +1,12 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.2 2003-08-08 16:16:58 bronto Exp $
+# $Id: BasicCheck.pm,v 1.3 2003-08-10 15:28:46 bronto Exp $
 
 use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant MIN => 0 ;
 use constant MAX => 1 ;
@@ -156,58 +156,163 @@ sub _rotations {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Data::Password::BasicCheck - Perl extension for blah blah blah
+Data::Password::BasicCheck - Basic password checking
 
 =head1 SYNOPSIS
 
   use Data::Password::BasicCheck;
-  blah blah blah
+
+  # Create a password checker object. We require that passwords
+  # are at least 6 characters long, and no more than 8. We also
+  # require that there are at least L/2 different symbols in the
+  # password, where L is the password length. So, for a 6 caracter
+  # long password, we require at least 3 different symbols, for
+  # 8 characters long password we require at least 4 different
+  # symbols, for 7 characters long password we again require
+  # 4 symbols, since 7 *.5 = 3.5, which rounds to 4.
+  my $pwcheck = Data::Password::BasicCheck->new(6, # minimal length
+                                                8, # maximum length
+                                                .5) ; # symbol factor
+
+  my $ok = $pwcheck->OK ;
+  my $check = $pwcheck->('bronto','My!Pass1',
+                         'Marco', 'Marongiu', 'Los Angeles') ;
+
+  unless ($check eq $ok) { die "Use a good password, you idiot!" }
 
 =head1 ABSTRACT
 
-  This should be the abstract for Data::Password::BasicCheck.
-  The abstract is used when making PPD (Perl Package Description) files.
-  If you don't want an ABSTRACT you should also edit Makefile.PL to
-  remove the ABSTRACT_FROM option.
+This class is used to build basic password checkers. They don't match
+password against dictionaries, nor they do complex elaborations. They
+just check that minimal security conditions are verified.
 
 =head1 DESCRIPTION
 
-Stub documentation for Data::Password::BasicCheck, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+Data::Password::BasicChecker objects do these kind of checks on the
+given passwords:
 
-Blah blah blah.
+=over 4
 
-=head2 EXPORT
+=item *
 
-None by default.
+password length is in a defined range that is estabilished at object
+creation; 
+
+=item *
+
+there are at least pL symbols in password, where L is password length
+and p is 0 < p =< 1. If not specified at object creation we assume
+p =  2/3 (that is: 0.66666...)
+
+=item *
+
+password contains alphabetic characters, digits and non-alphanumeric
+characters; 
+
+=item *
+
+rotations of the password don't match it
+
+=item *
+
+after cleaning away digits and symbols, the password, its reverse and
+all possible rotations don't match any personal information given
+(name, surname, city, username)
+
+=back
 
 
+=head1 METHODS
+
+=head2 new
+
+creates a password checker object. Takes two mandatory arguments and
+an optional third argument. The are: minimal and maximal password
+length and a symbol factor, which defaults to 2/3 (0.6666....). A
+symbol factor is a number p such that 0 < p <= 1. Given p, a password
+of length L must contain at least round(p*L) characters. For example,
+a 6-character long password must contain at least 4 different symbols
+by default.
+
+=head2 minlen
+
+returns the minimal password length as defined upon object creation.
+
+=head2 maxlen
+
+returns the maximal password length as defined upon object creation.
+
+=head2 psym
+
+returns the symbol factor as defined upon object creation, or the
+default one otherwise.
+
+=head2 check
+
+takes five arguments: a username, a password, first name, last name
+and city. It first checks that the password in itself is good; if it
+isn't, checks to see if there exists at least a segment of mnimal
+length that cold be considered secure (the reason for this check will
+be explained in the next revision of this document). It returns a
+string stating if the password was good or not (in english, sorry;
+yes, we need a bit of internationalization here!!!).
+
+You can see what the message for a good password looks like by
+examining Data::Password::BasicCheck->OK.
+
+
+=head1 TO DO
+
+=over 4
+
+=item *
+
+Write a better documentation!
+
+=item *
+
+check should return numeric values, starting from 0 (OK).
+
+=back
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+The book I<Essential System Administration>, by Aeleen Frisch, printed
+by O'Reilly and Associates;
 
-If you have a mailing list set up for your module, mention it here.
+The PerlMonks web site, L<http://www.perlmonks.org/>, where the ideas
+behind this module have been largely discussed.
 
-If you have a web site set up for your module, mention it here.
+Many people among the Italian Perl Mongers, which you can find on IRC
+on the channel #nordest.pm on slashnet
 
 =head1 AUTHOR
 
-Marco Marongiu, E<lt>bronto@c47.orgE<gt>
+Marco Marongiu, E<lt>bronto@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2003 by Marco Marongiu
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General
+Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General
+Public License along with this program; if not, write
+to the Free Software Foundation, Inc., 59 Temple Place
+- Suite 330, Boston, MA 02111-1307, USA.
+
 
 =cut
