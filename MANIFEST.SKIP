@@ -1,0 +1,9 @@
+~$
+\.old$
+^Makefile$
+^MANIFEST(\..*)?$
+^.*\.tar\.gz$
+^etc$
+/?\.\#
+CVS
+RCS
