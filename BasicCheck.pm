@@ -1,12 +1,12 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.7 2003-09-18 20:38:12 bronto Exp $
+# $Id: BasicCheck.pm,v 1.8 2004-03-09 10:58:49 bronto Exp $
 
 use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 # Object parameters
 use constant MIN => 0 ;
@@ -35,8 +35,8 @@ sub new {
 
   # Avoid bothering about uninitialized values...
   no warnings ;
-  return undef unless $minlen =~ /^\d$/ and $minlen >= 0 ;
-  return undef unless $maxlen =~ /^\d$/ and $maxlen >= $minlen ;
+  return undef unless $minlen =~ /^\d+$/ and $minlen >= 0 ;
+  return undef unless $maxlen =~ /^\d+$/ and $maxlen >= $minlen ;
   $psym = 2/3  unless $psym > 0 ;
 
   return bless [$minlen,$maxlen,$psym],$class ;
