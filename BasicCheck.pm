@@ -1,12 +1,10 @@
 package Data::Password::BasicCheck;
 
-# $Id: BasicCheck.pm,v 1.8 2004-03-09 10:58:49 bronto Exp $
-
 use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 # Object parameters
 use constant MIN => 0 ;
@@ -97,7 +95,7 @@ sub _docheck {
       $unique{$char}++;
     }
     ;
-    return SYM
+    return NOSYM
       unless scalar keys %unique >= sprintf "%.0f",$psym * $plen ;
   }
 
