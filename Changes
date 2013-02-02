@@ -1,6 +1,14 @@
 Revision history for Perl extension Data::Password::BasicCheck.
 
-$Id: Changes,v 1.5 2003-09-18 20:38:12 bronto Exp $
+2.02  Sat Feb  2 15:09:20 CET 2013
+        - fixing bug 83036: BasicCheck.pm returns incorrect error code
+	  when there are not enough different symbols.
+	  See https://rt.cpan.org/Ticket/Display.html?id=83036 for details
+	  So strange to get a bug report nearly 9 years after the last
+	  release of the module!!!
+
+2.01  Released on March 8, 2004
+        - fixed some oddities in new()
 
 2.00  Thu Sep 18 22:10:24 CEST 2003
         - 1.00 was too stupid! Now you can check your password against
