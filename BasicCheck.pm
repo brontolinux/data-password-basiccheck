@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 # Object parameters
 use constant MIN => 0 ;
@@ -201,7 +201,7 @@ This class is used to build basic password checkers. They don't match
 password against dictionaries, nor they do complex elaborations. They
 just check that minimal security conditions are verified.
 
-If you need a more accurate check, e.g. against a dicitonary, you
+If you need a more accurate check, e.g. against a dictionary, you
 should consider using a different module, like Data::Password.
 
 =head1 DESCRIPTION

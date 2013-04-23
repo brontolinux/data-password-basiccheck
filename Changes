@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Password::BasicCheck.
 
+2.03  Tue Apr 23 11:19:46 CEST 2013
+        - fixing bug 84736: spelling error in documentation
+
 2.02  Sat Feb  2 15:09:20 CET 2013
         - fixing bug 83036: BasicCheck.pm returns incorrect error code
 	  when there are not enough different symbols.
