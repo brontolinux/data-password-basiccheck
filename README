@@ -1,7 +1,7 @@
-Data/Password/BasicCheck version 2.00
+Data/Password/BasicCheck version 2.03
 =====================================
 
-    Data::Password::BasicChecker objects do these kind of checks on the
+    Data::Password::BasicCheck objects do these kind of checks on the
     given passwords:
 
     *   password length is in a defined range that is estabilished at
@@ -52,5 +52,3 @@ Public License along with this program; if not, write
 to the Free Software Foundation, Inc., 59 Temple Place
 - Suite 330, Boston, MA 02111-1307, USA.
 
-
-$Id: README,v 1.5 2003-09-18 20:38:12 bronto Exp $
